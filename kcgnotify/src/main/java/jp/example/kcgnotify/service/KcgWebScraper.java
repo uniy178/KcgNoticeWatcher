@@ -3,32 +3,26 @@ package jp.example.kcgnotify.service;
 import jp.example.kcgnotify.model.Notice;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class KcgWebScraper {
-    private static final String KCG_URL = ""; // URLを入力
 
-    public List<Notice> scrapeLatestNotices() {
+    public List<Notice> fetch() {
         List<Notice> list = new ArrayList<>();
-        try {
-            // サイトのHTMLを取得
-            Document doc = Jsoup.connect(KCG_URL).get();
-            // お知らせの一覧（aタグなど）を特定して抽出
-            // ※セレクタは実際のサイト構造に合わせて調整が必要
-            Elements elements = doc.select(".news-list a"); 
 
-            elements.forEach(el -> {
-                String title = el.text();
-                String url = el.absUrl("href");
-                list.add(new Notice(title, url));
+        try {
+            Document doc = Jsoup.connect("https://www.kcg.ac.jp/").get();
+            doc.select("li").forEach(e -> {
+                list.add(new Notice(e.text()));
             });
         } catch (Exception e) {
-            System.err.println("スクレイピングに失敗しました: " + e.getMessage());
+            e.printStackTrace();
         }
+
         return list;
     }
 }
