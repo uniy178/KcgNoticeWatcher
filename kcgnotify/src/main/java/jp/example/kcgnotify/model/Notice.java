@@ -1,29 +1,29 @@
 package jp.example.kcgnotify.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Notice {
 
-    private String title;
+    private final String title;
+    private final String content;
+    private final LocalDateTime publishedAt;
 
-    public Notice(String title) {
-        this.title = title;
+    public Notice(String title, String content, LocalDateTime publishedAt) {
+        this.title = Objects.requireNonNull(title);
+        this.content = Objects.requireNonNull(content);
+        this.publishedAt = Objects.requireNonNull(publishedAt);
     }
 
     public String getTitle() {
         return title;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Notice)) return false;
-        Notice notice = (Notice) o;
-        return Objects.equals(title, notice.title);
+    public String getContent() {
+        return content;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(title);
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
     }
 }

@@ -1,29 +1,36 @@
 package jp.example.kcgnotify.service;
 
-import okhttp3.*;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import jp.example.kcgnotify.model.Notice;
 
 @Service
 public class DiscordNotifier {
 
-    private static final String WEBHOOK_URL = "ここにWebhook";
-    private final OkHttpClient client = new OkHttpClient();
+    @Value("${discord.webhook.url}")
+    private String webhookUrl;
 
-    public void send(String message) {
-        String json = "{\"content\":\"" + message + "\"}";
-        RequestBody body = RequestBody.create(
-                json, MediaType.get("application/json")
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public void send(Notice notice) {
+        String message = """
+        📢 新しいお知らせ
+
+        ■ %s
+        %s
+        """.formatted(
+            notice.getTitle(),
+            notice.getContent()
         );
 
-        Request request = new Request.Builder()
-                .url(WEBHOOK_URL)
-                .post(body)
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            // OK
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        restTemplate.postForObject(
+            webhookUrl,
+            Map.of("content", message),
+            String.class
+        );
     }
 }
