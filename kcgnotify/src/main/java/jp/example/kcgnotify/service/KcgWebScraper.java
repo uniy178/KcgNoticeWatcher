@@ -1,23 +1,20 @@
 package jp.example.kcgnotify.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import jp.example.kcgnotify.model.Notice;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 public class KcgWebScraper {
 
-    // テスト用：固定データ
-    public List<Notice> fetchNotices() {
-        return List.of(
-            new Notice(
-                "【テスト】KCGポータル更新",
-                "これはスクレイピング前の仮通知です。",
-                LocalDateTime.now()
-            )
-        );
+    @Value("${kcg.target.url}")
+    private String targetUrl;
+
+    public Notice fetch() throws Exception {
+        Document doc = Jsoup.connect(targetUrl).get();
+        String text = doc.title() + " / " + doc.select("body").text();
+        return new Notice(text);
     }
 }

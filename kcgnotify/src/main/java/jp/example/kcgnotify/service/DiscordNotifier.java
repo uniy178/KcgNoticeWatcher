@@ -1,12 +1,12 @@
 package jp.example.kcgnotify.service;
 
-import java.util.Map;
-
+import jp.example.kcgnotify.model.Notice;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import jp.example.kcgnotify.model.Notice;
+import java.util.Map;
 
 @Service
 public class DiscordNotifier {
@@ -16,21 +16,16 @@ public class DiscordNotifier {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void send(Notice notice) {
-        String message = """
-        📢 新しいお知らせ
+    public void notify(Notice notice) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ■ %s
-        %s
-        """.formatted(
-            notice.getTitle(),
-            notice.getContent()
+        // ★ 通知文を固定
+        Map<String, String> body = Map.of(
+                "content", "🔔 監視Webが更新されました"
         );
 
-        restTemplate.postForObject(
-            webhookUrl,
-            Map.of("content", message),
-            String.class
-        );
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+        restTemplate.postForEntity(webhookUrl, entity, String.class);
     }
 }

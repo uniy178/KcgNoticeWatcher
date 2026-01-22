@@ -1,40 +1,40 @@
 package jp.example.kcgnotify.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import jp.example.kcgnotify.model.Notice;
 import jp.example.kcgnotify.store.NoticeStore;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UpdateCheckService {
 
     private final KcgWebScraper scraper;
     private final DiffChecker diffChecker;
-    private final NoticeStore store;
     private final DiscordNotifier notifier;
+    private final NoticeStore store;
 
     public UpdateCheckService(
             KcgWebScraper scraper,
             DiffChecker diffChecker,
-            NoticeStore store,
-            DiscordNotifier notifier) {
-
+            DiscordNotifier notifier,
+            NoticeStore store
+    ) {
         this.scraper = scraper;
         this.diffChecker = diffChecker;
-        this.store = store;
         this.notifier = notifier;
+        this.store = store;
     }
 
     public void check() {
-        List<Notice> notices = scraper.fetchNotices();
+        try {
+            Notice current = scraper.fetch();
+            Notice previous = store.getLast();
 
-        for (Notice notice : notices) {
-            if (diffChecker.isNew(notice)) {
-                notifier.send(notice);
-                store.save(notice);
+            if (diffChecker.hasDiff(previous, current)) {
+                notifier.notify(current);
+                store.save(current);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,20 +1,15 @@
 package jp.example.kcgnotify.service;
 
-import org.springframework.stereotype.Component;
-
 import jp.example.kcgnotify.model.Notice;
-import jp.example.kcgnotify.store.NoticeStore;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class DiffChecker {
 
-    private final NoticeStore store;
-
-    public DiffChecker(NoticeStore store) {
-        this.store = store;
-    }
-
-    public boolean isNew(Notice notice) {
-        return store.isNew(notice);
+    public boolean hasDiff(Notice oldNotice, Notice newNotice) {
+        if (oldNotice == null) {
+            return true;
+        }
+        return !oldNotice.getContent().equals(newNotice.getContent());
     }
 }
