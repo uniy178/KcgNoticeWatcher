@@ -20,7 +20,7 @@ public class DiscordNotifier {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // ★ 通知文を固定
+        // 通知文を固定
         Map<String, String> body = Map.of(
                 "content", "🔔 監視Webが更新されました"
         );
